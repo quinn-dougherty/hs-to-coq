@@ -46,6 +46,7 @@ jobs:
     needs: pre_check
     if: ${{ needs.pre_check.outputs.should_skip_coq != 'true' }}
     steps:
+      - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v13
       - name: nix build coq dependencies with ${{ matrix.coq }}
         run: nix-build -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }}
