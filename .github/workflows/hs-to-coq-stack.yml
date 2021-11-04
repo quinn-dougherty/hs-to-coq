@@ -1,4 +1,4 @@
-name: hs-to-coq
+name: hs-to-coq w stack/opam
 
 on: [push, pull_request]
 

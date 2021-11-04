@@ -1,4 +1,4 @@
-name: hs-to-coq
+name: hs-to-coq w nix
 
 on: [push, pull_request]
 
@@ -33,8 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v13
+      - name: nix build hs-to-coq with ${{ matrix.ghc }}
         run: nix-build -A haskellPackages.hs-to-coq --argstr ghcVersion ${{ matrix.ghc }}
-      - name: Build hs-to-coq executable
 
   installing-coq:
     name: Installing Coq dependencies
@@ -47,7 +47,8 @@ jobs:
     if: ${{ needs.pre_check.outputs.should_skip_coq != 'true' }}
     steps:
       - uses: cachix/install-nix-action@v13
-      - nix-build -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }}
+      - name: nix build coq dependencies with ${{ matrix.coq }}
+        run: nix-build -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }}
 
   test-coq-files:
     name: Testing base, containers, transformers, GHC, etc.
@@ -63,37 +64,36 @@ jobs:
       - uses: actions/checkout@v2
       - name: Compiling base
         run: |
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd base; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C base"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd base-thy; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C base-thy"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd base; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C base"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd base-thy; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C base-thy"
       - name: Compiling transformers
         run: |
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/transformers/lib; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/transformers/lib"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/transformers/theories; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/transformers/theories"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/transformers/lib; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/transformers/lib"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/transformers/theories; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/transformers/theories"
       - name: Compiling containers
         run: |
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/containers/lib; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/containers/lib"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/containers/theories; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/containers/theories"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/containers/lib; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/containers/lib"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/containers/theories; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/containers/theories"
       - name: Compiling GHC and core-semantics
         run: |
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/ghc/lib; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/ghc/lib"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/ghc/theories; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/ghc/theories"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/core-semantics/lib; coq_makefile -f _CoqProject -o Makefile)"
-
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/core-semantics/lib"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/ghc/lib; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/ghc/lib"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/ghc/theories; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/ghc/theories"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/core-semantics/lib; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/core-semantics/lib"
       - name: Compiling Graph (FGL)
         run: |
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/graph/lib; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/graph/lib"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd examples/graph/theories; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/graph/theories"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/graph/lib; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/graph/lib"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd examples/graph/theories; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/graph/theories"
 
   tests:
     name: Tests, base tests, and other examples
@@ -111,23 +111,23 @@ jobs:
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v13
       - name: Build hs-to-coq
-        run: nix-build -A haskellPackages.hs-to-coq --argstr ghcVersion ${{ ghc }}
+        run: nix-build -A haskellPackages.hs-to-coq --argstr ghcVersion ${{ matrix.ghc }}
       - name: Run tests
         run: |
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd base; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C base"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/tests"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/base-tests"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd base-thy; coq_makefile -f _CoqProject -o Makefile)"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C base-thy"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/successors"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/compiler"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/rle"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/bag"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/quicksort"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/dlist"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/intervals"
-          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C examples/coinduction"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd base; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C base"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/tests"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/base-tests"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "(cd base-thy; coq_makefile -f _CoqProject -o Makefile)"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C base-thy"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/successors"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/compiler"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/rle"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/bag"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/quicksort"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/dlist"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/intervals"
+          nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ matrix.coq }} --run "make -j -C examples/coinduction"
 
   test-translation:
     name: Translation (ensures convenience copy is up-to-date)
@@ -155,8 +155,8 @@ jobs:
           export PATH=$PATH:/usr/X11/bin >> ~/.bash_profile
 
       - uses: cachix/install-nix-action@v13
-      - name: Build hs-to-coq
-        run: nix-build -A haskellPackages.hs-to-coq
+      - name: Build hs-to-coq with ${{ matrix.ghc }}
+        run: nix-build -A haskellPackages.hs-to-coq --argstr ghcVersion ${{ matrix.ghc }}
       - name: Translating base
         run: |
           make -C examples/base-src clean
