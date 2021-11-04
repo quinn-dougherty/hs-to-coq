@@ -98,7 +98,7 @@ jobs:
   tests:
     name: Tests, base tests, and other examples
     runs-on: ${{ matrix.os }}
-    needs: [installing-haskell, installing-coq, pre_check]
+    needs: [installing-coq, pre_check]
     if: ${{ needs.pre_check.outputs.should_skip_coq != 'true' && needs.pre_check.outputs.should_skip_hs != 'true' }}
     strategy:
       matrix:
@@ -132,7 +132,7 @@ jobs:
   test-translation:
     name: Translation (ensures convenience copy is up-to-date)
     runs-on: ${{ matrix.os }}
-    needs: [installing-haskell, pre_check]
+    needs: [pre_check]
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -209,7 +209,7 @@ jobs:
   test-container-extraction:
     name: Testing containers extraction
     runs-on: ${{ matrix.os }}
-    needs: [installing-haskell, installing-coq, pre_check]
+    needs: [installing-coq, pre_check]
     strategy:
       matrix:
         os: [ubuntu-latest]
