@@ -112,7 +112,7 @@ jobs:
       - uses: cachix/install-nix-action@v13
       - name: Build hs-to-coq
         run: nix-build -A haskellPackages.hs-to-coq --argstr ghcVersion ${{ ghc }}
-     - name: Run tests
+      - name: Run tests
         run: |
           nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "(cd base; coq_makefile -f _CoqProject -o Makefile)"
           nix-shell -A coqPackages.hs-to-coq --argstr coqPackages ${{ coq }} --run "make -j -C base"
