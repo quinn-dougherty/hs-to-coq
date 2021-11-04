@@ -21,8 +21,8 @@ jobs:
         with:
           paths: '["examples/**", "base/**", "base-thy/**"]'
 
-  building-hs-to-coq-executable:
-    name: Installing Haskell dependencies
+  hs-to-coq-executable:
+    name: Building hs-to-coq executable
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -54,7 +54,7 @@ jobs:
   test-coq-files:
     name: Testing base, containers, transformers, GHC, etc.
     runs-on: ${{ matrix.os }}
-    needs: [installing-coq, pre_check]
+    needs: [hs-to-coq-executable, installing-coq, pre_check]
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -99,7 +99,7 @@ jobs:
   tests:
     name: Tests, base tests, and other examples
     runs-on: ${{ matrix.os }}
-    needs: [installing-coq, pre_check]
+    needs: [hs-to-coq-executable, installing-coq, pre_check]
     if: ${{ needs.pre_check.outputs.should_skip_coq != 'true' && needs.pre_check.outputs.should_skip_hs != 'true' }}
     strategy:
       matrix:
@@ -133,7 +133,7 @@ jobs:
   test-translation:
     name: Translation (ensures convenience copy is up-to-date)
     runs-on: ${{ matrix.os }}
-    needs: [pre_check]
+    needs: [hs-to-coq-executable, pre_check]
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -210,7 +210,7 @@ jobs:
   test-container-extraction:
     name: Testing containers extraction
     runs-on: ${{ matrix.os }}
-    needs: [installing-coq, pre_check]
+    needs: [hs-to-coq-executable, installing-coq, pre_check]
     strategy:
       matrix:
         os: [ubuntu-latest]
