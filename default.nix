@@ -7,8 +7,11 @@
 #   nix-build -A haskellPackages.hs-to-coq
 # After building, you can run result/bin/hs-to-coq
 
-{ coqPackages ? "coqPackages_8_10"
-, ghcVersion  ? "ghc884"
+{ coqPackages ? "coqPackages_8_10"  # this nixpkgs supports intersect compatibleCoqVersions below:
+  # coqPackages_8_6, coqPackages_8_7, coqPackages_8_8, coqPackages_8_10
+  # which can be passed in with --argstr coqPackages coqPackages_8_10
+, ghcVersion  ? "ghc884"  # this nixpkg rev supports ghc884, ghc8104, ghc901,
+# which can be passed in with `--argstr ghcVersion ghc901`
 
 , rev    ? "4c2e7becf1c942553dadd6527996d25dbf5a7136"
 , sha256 ? "10dzi5xizgm9b3p5k963h5mmp0045nkcsabqyarpr7mj151f6jpm"
