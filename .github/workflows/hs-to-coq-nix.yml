@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        ghc: [ghc883, ghc8104, ghc901]
+        ghc: [ghc884, ghc8104, ghc901]
     needs: pre_check
     if: ${{ needs.pre_check.outputs.should_skip_hs != 'true' }}
     steps:
@@ -104,7 +104,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        ghc: [ghc883, ghc8104, ghc901]
+        ghc: [ghc884, ghc8104, ghc901]
         resolver: [lts-12.0]
         ocaml: [4.07.1]
         coq: [coqPackages_8_6, coqPackages_8_7, coqPackages_8_8, coqPackages_8_10]
@@ -137,7 +137,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        ghc: [ghc883, ghc8104, ghc901]
+        ghc: [ghc884, ghc8104, ghc901]
         resolver: [lts-12.0]
         ocaml: [4.07.1]
         coq: [coqPackages_8_6, coqPackages_8_7, coqPackages_8_8, coqPackages_8_10]
@@ -214,7 +214,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        ghc: [ghc883, ghc8104, ghc901]
+        ghc: [ghc884, ghc8104, ghc901]
         resolver: [lts-12.0]
         ocaml: [4.07.1]
         coq: [coqPackages_8_6, coqPackages_8_7, coqPackages_8_8, coqPackages_8_10]
